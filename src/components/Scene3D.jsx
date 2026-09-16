@@ -1,88 +1,79 @@
-import { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Points, PointMaterial, Float, Icosahedron, MeshDistortMaterial } from '@react-three/drei'
-import * as THREE from 'three'
+import { useRef } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { StorefrontFacade } from './3d/StorefrontFacade'
+import { StoreDoor } from './3d/StoreDoor'
+import { InteriorShowroom } from './3d/InteriorShowroom'
+import { DiscoveryStation } from './3d/DiscoveryStation'
+import { CameraController } from './3d/CameraController'
 
-function Starfield() {
-  const ref = useRef()
-  const count = 2200
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      const r = 4 + Math.random() * 9
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      arr[i * 3] = r * Math.sin(phi) * Math.cos(theta)
-      arr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta)
-      arr[i * 3 + 2] = r * Math.cos(phi)
-    }
-    return arr
-  }, [])
+export default function Scene3D({ scrollProgress, onTriggerAction, quality }) {
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const isLow = quality?.tier === 'low'
+  const enableShadows = Boolean(quality?.enableShadows)
+  const dpr = quality?.dpr || 1.0
 
-  useFrame((state, delta) => {
-    if (!ref.current) return
-    ref.current.rotation.y += delta * 0.03
-    ref.current.rotation.x += delta * 0.01
-  })
-
-  return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-      <PointMaterial
-        transparent
-        color="#5fd6ff"
-        size={0.022}
-        sizeAttenuation
-        depthWrite={false}
-        opacity={0.85}
-      />
-    </Points>
-  )
-}
-
-function Core({ mouse }) {
-  const ref = useRef()
-  useFrame((state) => {
-    if (!ref.current) return
-    const t = state.clock.getElapsedTime()
-    ref.current.rotation.y = t * 0.15 + mouse.current.x * 0.4
-    ref.current.rotation.x = t * 0.1 + mouse.current.y * 0.3
-  })
-  return (
-    <Float speed={1.4} rotationIntensity={0.6} floatIntensity={1.2}>
-      <Icosahedron ref={ref} args={[1.5, 6]} position={[0, 0, 0]}>
-        <MeshDistortMaterial
-          color="#2ee6d6"
-          emissive="#1b6cff"
-          emissiveIntensity={0.35}
-          roughness={0.15}
-          metalness={0.9}
-          distort={0.38}
-          speed={1.6}
-          wireframe
-        />
-      </Icosahedron>
-    </Float>
-  )
-}
-
-export default function Scene3D() {
-  const mouse = useRef({ x: 0, y: 0 })
-  const onMove = (e) => {
-    mouse.current.x = (e.clientX / window.innerWidth - 0.5) * 2
-    mouse.current.y = (e.clientY / window.innerHeight - 0.5) * 2
+  const onPointerMove = (e) => {
+    if (quality?.isMobile) return // Disable mouse calculations on mobile
+    mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2
+    mouseRef.current.y = -(e.clientY / window.innerHeight - 0.5) * 2
   }
+
   return (
     <div
-      onPointerMove={onMove}
-      style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'auto' }}
+      onPointerMove={onPointerMove}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'auto',
+        background: '#090A0D',
+      }}
     >
-      <Canvas camera={{ position: [0, 0, 6], fov: 55 }} dpr={[1, 2]}>
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={1.2} color="#4f8cff" />
-        <pointLight position={[-10, -8, -6]} intensity={0.8} color="#8b5cf6" />
-        <Core mouse={mouse} />
-        <Starfield />
+      <Canvas
+        shadows={enableShadows}
+        camera={{ position: [0, 0.4, 12.5], fov: 50, near: 0.1, far: 80 }}
+        dpr={dpr}
+        gl={{
+          antialias: !isLow,
+          alpha: false,
+          powerPreference: isLow ? 'low-power' : 'high-performance',
+          stencil: false,
+          depth: true,
+        }}
+      >
+        {/* Warm exterior + interior ambient lighting */}
+        <ambientLight intensity={isLow ? 0.7 : 0.5} color="#F5F2EA" />
+
+        {/* Sunlight / Outdoor Street ambience */}
+        <directionalLight
+          position={[6, 12, 10]}
+          intensity={isLow ? 1.0 : 1.3}
+          color="#FAF5E8"
+          castShadow={enableShadows}
+          shadow-mapSize-width={enableShadows ? 1024 : 256}
+          shadow-mapSize-height={enableShadows ? 1024 : 256}
+        />
+
+        {/* Warm Interior Glow filtering through the storefront */}
+        <pointLight position={[0, 2.2, -1]} intensity={2.8} distance={14} color="#FFDCA8" />
+        {!isLow && (
+          <pointLight position={[0, 2.0, -8]} intensity={3.0} distance={18} color="#FFE6C2" />
+        )}
+
+        {/* 3D World Components */}
+        <StorefrontFacade scrollProgress={scrollProgress} isLow={isLow} />
+        <StoreDoor scrollProgress={scrollProgress} />
+        <InteriorShowroom scrollProgress={scrollProgress} isLow={isLow} />
+        <DiscoveryStation
+          scrollProgress={scrollProgress}
+          onTriggerAction={onTriggerAction}
+        />
+
+        {/* Scroll-Linked Camera Controller */}
+        <CameraController scrollProgress={scrollProgress} mouseRef={mouseRef} />
       </Canvas>
     </div>
   )
 }
+
+

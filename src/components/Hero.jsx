@@ -1,73 +1,104 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { profile, stats } from '../data'
 
-export default function Hero() {
-  const rolesRef = useRef(null)
+export default function Hero({ onOpenScan }) {
+  const heroRef = useRef(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.hero-line', {
-        y: 60,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.12,
-        ease: 'power4.out',
-        delay: 0.2,
-      })
-      gsap.from('.hero-meta > *', {
+      gsap.from('.hero-eyebrow', {
         y: 20,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.08,
+        duration: 0.9,
         ease: 'power3.out',
-        delay: 0.9,
+        delay: 0.2,
       })
-      gsap.from('.hero-stat', {
-        y: 24,
+      gsap.from('.hero-main-title', {
+        y: 40,
+        opacity: 0,
+        duration: 1.1,
+        ease: 'power4.out',
+        delay: 0.35,
+      })
+      gsap.from('.hero-tagline', {
+        y: 25,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        delay: 0.55,
+      })
+      gsap.from('.hero-actions-row > *', {
+        y: 20,
         opacity: 0,
         duration: 0.8,
         stagger: 0.1,
         ease: 'power3.out',
-        delay: 1.2,
+        delay: 0.75,
       })
-    })
+      gsap.from('.hero-pill-stats > *', {
+        y: 15,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: 'power3.out',
+        delay: 0.95,
+      })
+    }, heroRef)
+
     return () => ctx.revert()
   }, [])
 
   return (
-    <section className="hero" id="top">
+    <section className="hero" id="top" ref={heroRef}>
       <div className="wrap hero-inner">
-        <p className="eyebrow hero-line">{profile.location}</p>
-        <h1 className="hero-title">
-          <span className="hero-line">Syed Jawad</span>
-          <span className="hero-line gradient-text">Haider Rizvi</span>
-        </h1>
-        <div className="hero-roles hero-line" ref={rolesRef}>
-          {profile.roles.map((r, i) => (
-            <span key={r} className="role-chip">
-              {r}
-              {i < profile.roles.length - 1 && <i>•</i>}
-            </span>
-          ))}
-        </div>
-        <p className="hero-tagline hero-line">{profile.tagline}</p>
-        <div className="hero-meta">
-          <a className="btn btn-primary" href="#work">View My Work →</a>
-          <a className="btn btn-ghost" href="#contact">Let's Talk</a>
-        </div>
-        <div className="hero-stats">
-          {stats.map((s) => (
-            <div className="hero-stat" key={s.label}>
-              <div className="hero-stat-value gradient-text">{s.value}</div>
-              <div className="hero-stat-label">{s.label}</div>
+        <div className="hero-content">
+          <p className="eyebrow hero-eyebrow">Physical Retail Discovery</p>
+          <h1 className="hero-main-title">
+            <span>SEE IT.</span>
+            <span>FIND IT.</span>
+            <span className="gold-text">NEARBY.</span>
+          </h1>
+
+          <p className="hero-tagline">
+            Your next find is already in a store around the corner. Search dresses, coats, and wardrobe essentials across verified physical boutiques in your city.
+          </p>
+
+          <div className="hero-actions-row">
+            <button className="btn btn-primary" onClick={onOpenScan}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="12" cy="12" r="9" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Scan What You See
+            </button>
+            <a href="#discover" className="btn btn-outline">
+              Explore Live Inventory ↓
+            </a>
+          </div>
+
+          <div className="hero-pill-stats">
+            <div className="pill-stat">
+              <span className="pill-dot" />
+              <strong>50+</strong>
+              <span>Local Boutiques</span>
             </div>
-          ))}
+            <div className="pill-stat">
+              <span className="pill-dot" />
+              <strong>1.4 km</strong>
+              <span>Avg Distance</span>
+            </div>
+            <div className="pill-stat">
+              <span className="pill-dot" />
+              <strong>Live</strong>
+              <span>Rack Inventory</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="hero-scroll">
-        <span>SCROLL</span>
-        <div className="hero-scroll-line" />
+
+      <div className="hero-scroll-indicator">
+        <span className="scroll-label">SCROLL TO ENTER STORE</span>
+        <div className="scroll-arrow-line" />
       </div>
     </section>
   )

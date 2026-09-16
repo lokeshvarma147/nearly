@@ -1,20 +1,21 @@
-# Portfolio v2 — Interactive 3D Developer Portfolio
+# NEARLY — Cinematic 3D Retail Discovery Experience
 
-A single-page developer portfolio built around a live WebGL scene. React 19 renders
-the UI, React Three Fiber drives the 3D layer, and GSAP ScrollTrigger ties camera
-movement and section reveals to scroll position.
+SEE IT. FIND IT. NEARBY.
 
-**Live:** [jawadrizvi.com/v2](https://jawadrizvi.com/v2)
+A scroll-linked 3D WebGL retail discovery experience and visual search platform connecting consumers with physical fashion inventory in nearby boutique stores.
 
----
+React 19 renders the UI, React Three Fiber and Three.js drive the 3D storefront and showroom world, and GSAP ScrollTrigger orchestrates the camera journey from the street outside into the store, through the wardrobe showroom, to the in-store discovery terminal, and into the 2D application surface.
 
-## Why this exists
+## The Core Story & Experience
 
-Most portfolio templates are static. The goal here was to make scrolling itself the
-interaction — the 3D scene reacts continuously to scroll progress rather than
-playing a canned animation, while staying accessible and fast on mobile.
+1. **Act 1 — Storefront Facade**: Stand outside an architectural glass boutique facade with warm lighting and the NEARLY store sign.
+2. **Door Opening**: Physical entrance double doors rotate open smoothly as the user scrolls forward.
+3. **Act 2 — Fashion Showroom**: Camera steps inside a walk-in wardrobe featuring hanging silk midi dresses, wool coats, and slatted walnut walls.
+4. **Act 3 — In-Store Discovery Station**: Encounter the central terminal asking *"What are you looking for?"* with Scan, Search, and Near Me actions.
+5. **Act 4 — 3D → 2D Signature Transition**: Camera zooms into the terminal screen as the interface expands seamlessly into a full-screen fashion visual search application.
+6. **Product Discovery & Map**: Real-time product results filtered by match confidence (Exact Match, Very Similar, Similar Style), category, and proximity radius with local store inventory and Google Maps directions.
 
-## Tech stack
+## Tech Stack
 
 | Layer | Choice |
 |---|---|
@@ -22,6 +23,7 @@ playing a canned animation, while staying accessible and fast on mobile.
 | Build tool | Vite 8 |
 | 3D rendering | Three.js + `@react-three/fiber` + `@react-three/drei` |
 | Animation | GSAP 3 (ScrollTrigger) |
+| Styling | Modular Vanilla CSS & Design Tokens |
 | Linting | ESLint 10 |
 
 ## Features
